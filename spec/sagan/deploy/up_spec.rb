@@ -25,12 +25,13 @@ describe Sagan::Deploy::Up, '#run' do
     end
 
     it 'sets the experimental server to unavailable' do
+      heroku.stub(:lock)
+
       capture_stdout do
         deploy.run
       end
 
-      expect(heroku).to have_received(:set_config)
-        .with('EXPERIMENTAL_AVAILABLE', false, 'exp2')
+      expect(heroku).to have_received(:lock).with('exp2')
     end
 
     it 'turns maintenance on before pushing' do
@@ -117,15 +118,10 @@ describe Sagan::Deploy::Up, '#run' do
   end
 
   def stub_unavailable_server(remote)
-    heroku.stub(:get_config)
-      .with('EXPERIMENTAL_AVAILABLE', remote)
-      .and_return("false\n")
-    heroku.stub(:set_config)
+    heroku.stub(:unlocked?).with(remote).and_return(false)
   end
 
   def stub_available_server(remote)
-    heroku.stub(:get_config)
-      .with('EXPERIMENTAL_AVAILABLE', remote)
-      .and_return("true\n")
+    heroku.stub(:unlocked?).with(remote).and_return(true)
   end
 end

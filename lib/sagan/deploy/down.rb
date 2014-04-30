@@ -1,8 +1,6 @@
 module Sagan
   module Deploy
     class Down
-      AVAILABILITY_KEY = 'EXPERIMENTAL_AVAILABLE'
-
       attr_reader :git, :heroku
 
       def initialize(git = Git.new, heroku = Heroku.new)
@@ -17,7 +15,7 @@ module Sagan
           if has_experimental_remote?(remote)
             puts "Unlocking #{remote}"
 
-            heroku.set_config(AVAILABILITY_KEY, true, remote)
+            heroku.unlock(remote)
             heroku.maintenance_on(remote)
 
             puts "#{remote} is now available for use"
@@ -27,7 +25,6 @@ module Sagan
         end
       end
 
-      private_constant :AVAILABILITY_KEY
       private :git, :heroku
       private
 

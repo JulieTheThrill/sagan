@@ -1,11 +1,12 @@
 module Sagan
   module Mocks
     class Heroku
-      def reset_db(*); end
-      def get_config(*); end
-      def set_config(*); end
+      def lock(*); end
+      def unlock(*); end
+      def unlocked?(*); end
       def maintenance_on(*); end
       def maintenance_off(*); end
+      def reset_db(*); end
     end
   end
 end

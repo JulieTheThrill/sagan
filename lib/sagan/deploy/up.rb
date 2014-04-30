@@ -1,8 +1,6 @@
 module Sagan
   module Deploy
     class Up
-      AVAILABILITY_KEY = 'EXPERIMENTAL_AVAILABLE'
-
       attr_reader :git, :heroku
 
       def initialize(git = Git.new, heroku = Heroku.new)
@@ -19,32 +17,27 @@ module Sagan
 
           begin
             remote = remotes[i]
-            available = experimental_available?(remote)
+            unlocked = heroku.unlocked?(remote)
 
-            if available
+            if unlocked
               deploy_to(remote)
             else
               puts "#{remote} is unavailable"
             end
             i = i + 1
-          end until i >= remotes.size || available
+          end until i >= remotes.size || unlocked
         else
           no_experimental_remotes
         end
       end
 
-      private_constant :AVAILABILITY_KEY
       private :git, :heroku
       private
-
-      def experimental_available?(remote)
-        heroku.get_config(AVAILABILITY_KEY, remote) == "true\n"
-      end
 
       def deploy_to(remote)
         puts "Deploying to #{remote}"
 
-        heroku.set_config(AVAILABILITY_KEY, false, remote)
+        heroku.lock(remote)
         heroku.maintenance_on(remote)
         git.force_push(remote)
 
