@@ -33,18 +33,8 @@ module Sagan
       private :git, :heroku
       private
 
-      def experimental_remotes
-        unless @experimental_remotes
-          remotes = git.remotes.split("\n")
-
-          @experimental_remotes = remotes.select { |r| r =~ /^exp\d+$/ }
-        end
-
-        @experimental_remotes
-      end
-
       def has_experimental_remote?(remote)
-        !!experimental_remotes.detect { |r| r == remote }
+        !!git.experimental_remotes.detect { |r| r == remote }
       end
     end
   end

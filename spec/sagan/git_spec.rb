@@ -11,13 +11,12 @@ describe Sagan::Git, '#force_push' do
   end
 end
 
-describe Sagan::Git, '#remotes' do
+describe Sagan::Git, '#experimental_remotes' do
   it 'returns the list of git remotes for the current working directory' do
     git = Sagan::Git.new
-    git.stub(:`)
+    remotes = "origin\nexp1\nexp2\n"
+    expect(git).to receive(:`).with('git remote').and_return(remotes)
 
-    git.remotes
-
-    expect(git).to have_received(:`).with('git remote')
+    expect(git.experimental_remotes).to eq ['exp1', 'exp2']
   end
 end

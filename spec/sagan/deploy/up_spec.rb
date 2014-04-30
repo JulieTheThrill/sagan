@@ -88,9 +88,7 @@ describe Sagan::Deploy::Up, '#run' do
   end
 
   context "when there aren't any experimental remotes" do
-    before do
-      stub_remotes('origin')
-    end
+    before { stub_remotes }
 
     it 'displays an error message' do
       output = capture_stdout_lines do
@@ -115,7 +113,7 @@ describe Sagan::Deploy::Up, '#run' do
   end
 
   def stub_remotes(*remotes)
-    git.stub(:remotes).and_return(remotes.join("\n"))
+    git.stub(:experimental_remotes).and_return(remotes)
   end
 
   def stub_unavailable_server(remote)

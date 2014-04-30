@@ -80,7 +80,7 @@ describe Sagan::Deploy::Down, '#run' do
   end
 
   def stub_remotes(*remotes)
-    git.stub(:remotes).and_return(remotes.join("\n"))
+    git.stub(:experimental_remotes).and_return(remotes)
   end
 
   def stub_unavailable_server(remote)

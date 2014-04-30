@@ -11,12 +11,14 @@ module Sagan
       end
 
       def run
-        if experimental_remotes.any?
+        remotes = git.experimental_remotes
+
+        if remotes.any?
           i = 0
           remote = nil
 
           begin
-            remote = experimental_remotes[i]
+            remote = remotes[i]
             available = experimental_available?(remote)
 
             if available
@@ -25,7 +27,7 @@ module Sagan
               puts "#{remote} is unavailable"
             end
             i = i + 1
-          end until i >= experimental_remotes.size || available
+          end until i >= remotes.size || available
         else
           no_experimental_remotes
         end
@@ -37,16 +39,6 @@ module Sagan
 
       def experimental_available?(remote)
         heroku.get_config(AVAILABILITY_KEY, remote) == "true\n"
-      end
-
-      def experimental_remotes
-        unless @experimental_remotes
-          remotes = git.remotes.split("\n")
-
-          @experimental_remotes = remotes.select { |r| r =~ /^exp\d+$/ }
-        end
-
-        @experimental_remotes
       end
 
       def deploy_to(remote)
