@@ -1,8 +1,14 @@
 module Sagan
   class Heroku
+    EXP = 'exp'
+    EXP_APP_BASE_NAME = 'schoolkeep-experimental-'
+
     def reset_db(remote)
-      app_name = remote.gsub('exp', 'schoolkeep-experimental-')
-      `heroku pg:reset DATABASE -r #{remote} --confirm #{app_name} && heroku run rake db:migrate db:seed -r #{remote} && heroku restart -r #{remote}`
+      app_name = remote.gsub(EXP, EXP_APP_BASE_NAME)
+
+      heroku("pg:reset DATABASE --confirm #{app_name}", remote)
+      heroku("run rake db:migrate db:seed", remote)
+      heroku("restart", remote)
     end
 
     def get_config(key, remote)
@@ -21,6 +27,7 @@ module Sagan
       heroku("maintenance:off", remote)
     end
 
+    private_constant :EXP, :EXP_APP_BASE_NAME
     private
 
     def heroku(cmd, remote)

@@ -3,12 +3,18 @@ require 'spec_helper'
 describe Sagan::Heroku, '#reset_db' do
   it 'resets, migrates and seeds the database on the given remote' do
     heroku = Sagan::Heroku.new
-    heroku.stub(:`)
+
+    expect(heroku).to receive(:`)
+      .with('heroku pg:reset DATABASE --confirm schoolkeep-experimental-1000 -r exp1000')
+      .ordered
+    expect(heroku).to receive(:`)
+      .with('heroku run rake db:migrate db:seed -r exp1000')
+      .ordered
+    expect(heroku).to receive(:`)
+      .with('heroku restart -r exp1000')
+      .ordered
 
     heroku.reset_db('exp1000')
-
-    reset_cmd = 'heroku pg:reset DATABASE -r exp1000 --confirm schoolkeep-experimental-1000 && heroku run rake db:migrate db:seed -r exp1000 && heroku restart -r exp1000'
-    expect(heroku).to have_received(:`).with(reset_cmd)
   end
 end
 
