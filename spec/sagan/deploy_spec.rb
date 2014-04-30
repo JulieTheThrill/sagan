@@ -4,14 +4,6 @@ describe Sagan::Deploy do
   describe '#up' do
     context 'when there are experimental remotes' do
       before do
-        # TODO (ak): Inject test git and heroku
-        git.stub(:force_push)
-        heroku.stub(:reset_db)
-        heroku.stub(:maintenance_on)
-        heroku.stub(:maintenance_off)
-        heroku.stub(:set_config)
-        heroku.stub(:get_config)
-
         stub_remotes('exp1', 'exp2')
         stub_unavailable_server('exp1')
         stub_available_server('exp2')
@@ -55,6 +47,8 @@ describe Sagan::Deploy do
       end
 
       it 'force pushes to the open server' do
+        git.stub(:force_push)
+
         capture_stdout do
           deployment.up
         end
@@ -63,6 +57,8 @@ describe Sagan::Deploy do
       end
 
       it 'resets the database on the open server' do
+        heroku.stub(:reset_db)
+
         output = capture_stdout do
           deployment.up
         end
@@ -109,12 +105,6 @@ describe Sagan::Deploy do
   end
 
   describe '#down' do
-    before do
-      # TODO (ak): Inject heroku test
-      heroku.stub(:maintenance_on)
-      heroku.stub(:set_config)
-    end
-
     context 'when the remote exists' do
       before do
         stub_remotes('exp1')
@@ -129,6 +119,8 @@ describe Sagan::Deploy do
       end
 
       it 'sets the experimental server to available' do
+        heroku.stub(:set_config)
+
         capture_stdout do
           deployment.down('exp1')
         end
@@ -138,6 +130,8 @@ describe Sagan::Deploy do
       end
 
       it 'turns maintenance on' do
+        heroku.stub(:maintenance_on)
+
         capture_stdout do
           deployment.down('exp1')
         end
@@ -166,7 +160,7 @@ describe Sagan::Deploy do
     end
 
     context "when the experimental remote doesn't exist" do
-      it 'displays a message' do
+      it 'displays an error message' do
         stub_remotes('exp1')
 
         output = capture_stdout_lines do
@@ -179,11 +173,11 @@ describe Sagan::Deploy do
   end
 
   def git
-    @git ||= Sagan::Git.new
+    @git ||= Sagan::Mocks::Git.new
   end
 
   def heroku
-    @heroku ||= Sagan::Heroku.new
+    @heroku ||= Sagan::Mocks::Heroku.new
   end
 
   def deployment
