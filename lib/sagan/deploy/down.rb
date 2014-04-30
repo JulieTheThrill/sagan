@@ -10,14 +10,12 @@ module Sagan
         @heroku = heroku
       end
 
-
       def down(remote)
         if remote.nil?
-          puts 'You must provide a remote to tear down'
-          puts 'rake exp:down[myremote]'
+          usage
         else
           if has_experimental_remote?(remote)
-            puts "Starting to make #{remote} available"
+            puts "Unlocking #{remote}"
 
             heroku.set_config(AVAILABILITY_KEY, true, remote)
             heroku.maintenance_on(remote)
@@ -35,6 +33,11 @@ module Sagan
 
       def has_experimental_remote?(remote)
         !!git.experimental_remotes.detect { |r| r == remote }
+      end
+
+      def usage
+        puts 'You must provide an experimental remote'
+        puts 'rake exp:down[myremote]'
       end
     end
   end

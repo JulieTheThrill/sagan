@@ -42,7 +42,7 @@ module Sagan
       end
 
       def deploy_to(remote)
-        puts "deploying to #{remote}"
+        puts "Deploying to #{remote}"
 
         heroku.set_config(AVAILABILITY_KEY, false, remote)
         heroku.maintenance_on(remote)

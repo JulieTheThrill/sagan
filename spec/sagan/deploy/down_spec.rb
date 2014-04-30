@@ -11,7 +11,7 @@ describe Sagan::Deploy::Down, '#run' do
         deploy.down('exp1')
       end
 
-      expect(output[0]).to eq "Starting to make exp1 available\n"
+      expect(output[0]).to eq "Unlocking exp1\n"
     end
 
     it 'sets the experimental server to available' do
@@ -50,7 +50,7 @@ describe Sagan::Deploy::Down, '#run' do
         deploy.down(nil)
       end
 
-      expect(output[0]).to eq "You must provide a remote to tear down\n"
+      expect(output[0]).to eq "You must provide an experimental remote\n"
       expect(output[1]).to eq "rake exp:down[myremote]\n"
     end
   end

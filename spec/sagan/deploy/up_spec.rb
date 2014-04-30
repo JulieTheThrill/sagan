@@ -21,7 +21,7 @@ describe Sagan::Deploy::Up, '#run' do
         deploy.run
       end
 
-      expect(output[1]).to eq "deploying to exp2\n"
+      expect(output[1]).to eq "Deploying to exp2\n"
     end
 
     it 'sets the experimental server to unavailable' do
