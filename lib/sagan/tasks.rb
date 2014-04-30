@@ -8,6 +8,6 @@ namespace :sagan do
 
   desc "Release the given experimental server for future deployments"
   task :down, :remote do |t, args|
-    Sagan::Deploy::Down.new.down(args[:remote])
+    Sagan::Deploy::Down.new(args[:remote]).run
   end
 end
