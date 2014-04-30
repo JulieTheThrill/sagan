@@ -1,7 +1,7 @@
 module Sagan
   class Git
     def force_push(remote)
-      `git push #{remote} HEAD:master -f`
+      git("push #{remote} HEAD:master -f")
     end
 
     def experimental_remotes
@@ -10,8 +10,12 @@ module Sagan
 
     private
 
+    def git(cmd)
+      `git #{cmd}`
+    end
+
     def remotes
-      @remotes ||= (`git remote`).split("\n")
+      @remotes ||= git('remote').split("\n")
     end
   end
 end
