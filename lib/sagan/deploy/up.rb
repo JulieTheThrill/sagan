@@ -1,11 +1,11 @@
 module Sagan
   module Deploy
     class Up
-      attr_reader :git, :heroku
+      attr_reader :git, :server_type
 
-      def initialize(git = Git.new, heroku = Heroku.new)
+      def initialize(git = Git.new, server_type = Heroku)
         @git = git
-        @heroku = heroku
+        @server_type = server_type
       end
 
       def run
@@ -13,16 +13,15 @@ module Sagan
 
         if remotes.any?
           i = 0
-          remote = nil
 
           begin
-            remote = remotes[i]
-            unlocked = heroku.unlocked?(remote)
+            server = server_type.new(remotes[i])
+            unlocked = server.unlocked?
 
             if unlocked
-              deploy_to(remote)
+              deploy_to(server)
             else
-              puts "#{remote} is unavailable"
+              puts "#{server.remote} is unavailable"
             end
             i = i + 1
           end until i >= remotes.size || unlocked
@@ -31,22 +30,22 @@ module Sagan
         end
       end
 
-      private :git, :heroku
+      private :git, :server_type
       private
 
-      def deploy_to(remote)
-        puts "Deploying to #{remote}"
+      def deploy_to(server)
+        puts "Deploying to #{server.remote}"
 
-        heroku.lock(remote)
-        heroku.maintenance_on(remote)
-        git.force_push(remote)
+        server.lock
+        server.maintenance_on
+        git.force_push(server.remote)
 
         puts 'Resetting database'
-        heroku.reset_db(remote)
+        server.reset_db
 
-        heroku.maintenance_off(remote)
+        server.maintenance_off
 
-        puts "Successfully deployed to http://www.#{remote}.schoolify.me"
+        puts "Successfully deployed to http://www.#{server.remote}.schoolify.me"
       end
 
       def no_experimental_remotes

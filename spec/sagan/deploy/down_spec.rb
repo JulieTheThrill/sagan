@@ -27,6 +27,7 @@ describe Sagan::Deploy::Down, '#run' do
   context 'when the remote exists' do
     before do
       stub_remotes('exp1')
+      stub_heroku_server('exp1')
     end
 
     it 'displays a start message' do
@@ -41,24 +42,24 @@ describe Sagan::Deploy::Down, '#run' do
 
     it 'sets the experimental server to available' do
       deploy = create_deploy('exp1')
-      heroku.stub(:unlock)
+      heroku_server.stub(:unlock)
 
       capture_stdout do
         deploy.run
       end
 
-      expect(heroku).to have_received(:unlock).with('exp1')
+      expect(heroku_server).to have_received(:unlock)
     end
 
     it 'turns maintenance on' do
       deploy = create_deploy('exp1')
-      heroku.stub(:maintenance_on)
+      heroku_server.stub(:maintenance_on)
 
       capture_stdout do
         deploy.run
       end
 
-      expect(heroku).to have_received(:maintenance_on).with('exp1')
+      expect(heroku_server).to have_received(:maintenance_on)
     end
 
     it 'displays a success message' do
@@ -89,12 +90,17 @@ describe Sagan::Deploy::Down, '#run' do
     @git ||= Sagan::Mocks::Git.new
   end
 
-  def heroku
-    @heroku ||= Sagan::Mocks::Heroku.new
+  def heroku_server
+    @heroku_server
   end
 
   def create_deploy(remote)
-    Sagan::Deploy::Down.new(remote, git, heroku)
+    Sagan::Deploy::Down.new(remote, git, Sagan::Mocks::Heroku)
+  end
+
+  def stub_heroku_server(remote)
+    @heroku_server = Sagan::Mocks::Heroku.new(remote)
+    Sagan::Mocks::Heroku.stub(:new).with(remote).and_return(@heroku_server)
   end
 
   def stub_remotes(*remotes)

@@ -1,12 +1,12 @@
 module Sagan
   module Deploy
     class Down
-      attr_reader :git, :heroku, :remote
+      attr_reader :git, :remote, :server
 
-      def initialize(remote, git = Git.new, heroku = Heroku.new)
+      def initialize(remote, git = Git.new, server_type = Heroku)
         @git = git
-        @heroku = heroku
         @remote = remote
+        @server = server_type.new(remote)
 
         usage if remote.nil?
       end
@@ -15,8 +15,8 @@ module Sagan
         if has_experimental_remote?(remote)
           puts "Unlocking #{remote}"
 
-          heroku.unlock(remote)
-          heroku.maintenance_on(remote)
+          server.unlock
+          server.maintenance_on
 
           puts "#{remote} is now available for use"
         else
@@ -24,7 +24,7 @@ module Sagan
         end
       end
 
-      private :git, :heroku, :remote
+      private :git, :remote, :server
       private
 
       def has_experimental_remote?(remote)

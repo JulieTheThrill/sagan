@@ -6,27 +6,33 @@ module Sagan
     LOCKED = 'false'
     UNLOCKED = 'true'
 
-    def lock(remote)
+    attr_reader :remote
+
+    def initialize(remote)
+      @remote = remote
+    end
+
+    def lock
       set_config(LOCK_KEY, LOCKED, remote)
     end
 
-    def unlock(remote)
+    def unlock
       set_config(LOCK_KEY, UNLOCKED, remote)
     end
 
-    def unlocked?(remote)
+    def unlocked?
       get_config(LOCK_KEY, remote).to_s.start_with?("true")
     end
 
-    def maintenance_off(remote)
+    def maintenance_off
       heroku("maintenance:off", remote)
     end
 
-    def maintenance_on(remote)
+    def maintenance_on
       heroku("maintenance:on", remote)
     end
 
-    def reset_db(remote)
+    def reset_db
       app_name = remote.gsub(EXP, EXP_APP_BASE_NAME)
 
       heroku("pg:reset DATABASE --confirm #{app_name}", remote)

@@ -3,9 +3,11 @@ require 'spec_helper'
 describe Sagan::Deploy::Up, '#run' do
   context 'when there are experimental remotes' do
     before do
-      stub_remotes('exp1', 'exp2')
-      stub_unavailable_server('exp1')
-      stub_available_server('exp2')
+      remotes = ['exp1', 'exp2']
+      stub_remotes(*remotes)
+      stub_heroku_servers(*remotes)
+      stub_unavailable_server(heroku_servers[0])
+      stub_available_server(heroku_servers[1])
     end
 
     it 'displays a message for the unavailable server' do
@@ -25,24 +27,26 @@ describe Sagan::Deploy::Up, '#run' do
     end
 
     it 'sets the experimental server to unavailable' do
-      heroku.stub(:lock)
+      heroku_remote = heroku_servers[1]
+      heroku_remote.stub(:lock)
 
       capture_stdout do
         deploy.run
       end
 
-      expect(heroku).to have_received(:lock).with('exp2')
+      expect(heroku_remote).to have_received(:lock)
     end
 
     it 'turns maintenance on before pushing' do
-      heroku.stub(:maintenance_on).ordered
+      heroku_remote = heroku_servers[1]
+      heroku_remote.stub(:maintenance_on).ordered
       git.stub(:force_push).ordered
 
       capture_stdout do
         deploy.run
       end
 
-      expect(heroku).to have_received(:maintenance_on).with('exp2')
+      expect(heroku_remote).to have_received(:maintenance_on)
       expect(git).to have_received(:force_push)
     end
 
@@ -57,26 +61,28 @@ describe Sagan::Deploy::Up, '#run' do
     end
 
     it 'resets the database on the open server' do
-      heroku.stub(:reset_db)
+      heroku_remote = heroku_servers[1]
+      heroku_remote.stub(:reset_db)
 
       output = capture_stdout do
         deploy.run
       end
 
-      expect(heroku).to have_received(:reset_db).with('exp2')
+      expect(heroku_remote).to have_received(:reset_db)
       expect(output).to include 'Resetting database'
     end
 
     it 'turns maintenance off after the database has been reset' do
-      heroku.stub(:reset_db).ordered
-      heroku.stub(:maintenance_off).ordered
+      heroku_remote = heroku_servers[1]
+      heroku_remote.stub(:reset_db).ordered
+      heroku_remote.stub(:maintenance_off).ordered
 
       capture_stdout do
         deploy.run
       end
 
-      expect(heroku).to have_received(:reset_db)
-      expect(heroku).to have_received(:maintenance_off).with('exp2')
+      expect(heroku_remote).to have_received(:reset_db)
+      expect(heroku_remote).to have_received(:maintenance_off)
     end
 
     it 'displays a success message' do
@@ -105,23 +111,32 @@ describe Sagan::Deploy::Up, '#run' do
     @git ||= Sagan::Mocks::Git.new
   end
 
-  def heroku
-    @heroku ||= Sagan::Mocks::Heroku.new
+  def heroku_servers
+    @heroku_servers
   end
 
   def deploy
-    @deploy ||= Sagan::Deploy::Up.new(git, heroku)
+    @deploy ||= Sagan::Deploy::Up.new(git, Sagan::Mocks::Heroku)
   end
 
   def stub_remotes(*remotes)
     git.stub(:experimental_remotes).and_return(remotes)
   end
 
-  def stub_unavailable_server(remote)
-    heroku.stub(:unlocked?).with(remote).and_return(false)
+  def stub_heroku_servers(*args)
+    @heroku_servers = args.map do |remote|
+      Sagan::Mocks::Heroku.new(remote)
+    end
+    Sagan::Mocks::Heroku.stub(:new).and_return do |remote|
+      @heroku_servers.detect { |r| r.remote == remote }
+    end
   end
 
-  def stub_available_server(remote)
-    heroku.stub(:unlocked?).with(remote).and_return(true)
+  def stub_unavailable_server(heroku_remote)
+    heroku_remote.stub(:unlocked?).and_return(false)
+  end
+
+  def stub_available_server(heroku_remote)
+    heroku_remote.stub(:unlocked?).and_return(true)
   end
 end
