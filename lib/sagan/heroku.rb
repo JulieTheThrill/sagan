@@ -44,7 +44,9 @@ module Sagan
     private
 
     def heroku(cmd, remote)
-      `heroku #{cmd} -r #{remote}`
+      Bundler.with_clean_env do
+        `heroku #{cmd} -r #{remote}`
+      end
     end
 
     def get_config(key, remote)

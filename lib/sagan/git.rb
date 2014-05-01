@@ -11,7 +11,9 @@ module Sagan
     private
 
     def git(cmd)
-      `git #{cmd}`
+      Bundler.with_clean_env do
+        `git #{cmd}`
+      end
     end
 
     def remotes
