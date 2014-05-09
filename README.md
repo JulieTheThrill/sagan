@@ -1,6 +1,9 @@
 # Sagan
 
-TODO: Write a gem description
+Deploy SchoolKeep to an experimental server
+
+[http://www.exp1.schoolify.me](http://www.exp1.schoolify.me) -> 
+[http://www.exp10.schoolify.me](http://www.exp10.schoolify.me)
 
 ## Installation
 
@@ -18,7 +21,15 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Deploy your current branch to an open experimental server
+
+    $ rake sagan:up
+
+Once you're finished with the experimental server make it available for 
+someone else. You can use the following command where `N` is the number of 
+the experimental server your were using.
+
+    $ rake sagan:down[expN]
 
 ## Contributing
 

@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Sagan::VERSION
   spec.authors       = ["Alex Kwiatkowski"]
   spec.email         = ["alex@schoolkeep.com"]
-  spec.summary       = %q{Deploy your SchoolKeep branch to an open 
+  spec.summary       = %q{Deploy your current branch to an open 
                       experimental server}
   spec.homepage      = "https://github.com/SchoolKeep/sagan"
   spec.license       = "MIT"
