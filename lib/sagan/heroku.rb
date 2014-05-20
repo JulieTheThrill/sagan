@@ -40,8 +40,8 @@ module Sagan
       heroku("restart", remote)
     end
 
-    private_constant :EXP, :EXP_APP_BASE_NAME, :LOCK_KEY, :LOCKED, :UNLOCKED
     private
+    private_constant :EXP, :EXP_APP_BASE_NAME, :LOCK_KEY, :LOCKED, :UNLOCKED
 
     def heroku(cmd, remote)
       Bundler.with_clean_env do

@@ -1,8 +1,6 @@
 module Sagan
   module Deploy
     class Down
-      attr_reader :git, :remote, :server
-
       def initialize(remote, git = Git.new, server_type = Heroku)
         @git = git
         @remote = remote
@@ -24,8 +22,9 @@ module Sagan
         end
       end
 
-      private :git, :remote, :server
       private
+
+      attr_reader :git, :remote, :server
 
       def has_experimental_remote?(remote)
         !!git.experimental_remotes.detect { |r| r == remote }

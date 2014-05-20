@@ -1,8 +1,6 @@
 module Sagan
   module Deploy
     class Up
-      attr_reader :git, :server_type
-
       def initialize(git = Git.new, server_type = Heroku)
         @git = git
         @server_type = server_type
@@ -30,8 +28,9 @@ module Sagan
         end
       end
 
-      private :git, :server_type
       private
+
+      attr_reader :git, :server_type
 
       def deploy_to(server)
         puts "Deploying to #{server.remote}"
