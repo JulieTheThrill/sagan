@@ -1,4 +1,4 @@
-# Sagan
+# Sagan [![Build Status](https://magnum.travis-ci.com/SchoolKeep/sagan.svg?token=9hAyxfYFq7FzmyU7gabg&branch=master)](https://magnum.travis-ci.com/SchoolKeep/sagan)
 
 Deploy SchoolKeep to an experimental server
 
