@@ -19,7 +19,7 @@ module Sagan
             if unlocked
               deploy_to(server)
             else
-              puts "#{server.remote} is unavailable"
+              show_unavailable_message(server)
             end
             i = i + 1
           end until i >= remotes.size || unlocked
@@ -38,6 +38,7 @@ module Sagan
         server.lock
         server.maintenance_on
         git.force_push(server.remote)
+        server.set_deployed_branch(git.current_branch)
 
         puts 'Resetting database'
         server.reset_db
@@ -50,6 +51,10 @@ module Sagan
       def no_experimental_remotes
         puts "You don't have any experimental git remotes"
         puts "Please add exp[1-n]"
+      end
+
+      def show_unavailable_message(server)
+        puts "#{server.remote} is unavailable - branch #{server.deployed_branch}"
       end
     end
   end

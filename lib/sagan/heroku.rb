@@ -1,5 +1,6 @@
 module Sagan
   class Heroku
+    DEPLOYED_BRANCH_KEY = 'SAGAN_BRANCH'
     EXP = 'exp'
     EXP_APP_BASE_NAME = 'schoolkeep-experimental-'
     LOCK_KEY = 'EXPERIMENTAL_AVAILABLE'
@@ -10,6 +11,14 @@ module Sagan
 
     def initialize(remote)
       @remote = remote
+    end
+
+    def deployed_branch
+      get_config(DEPLOYED_BRANCH_KEY, remote)
+    end
+
+    def set_deployed_branch(branch)
+      set_config(DEPLOYED_BRANCH_KEY, branch, remote)
     end
 
     def lock

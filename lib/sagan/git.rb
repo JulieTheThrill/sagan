@@ -1,11 +1,15 @@
 module Sagan
   class Git
-    def force_push(remote)
-      git("push #{remote} HEAD:master -f")
+    def current_branch
+      git("rev-parse --abbrev-ref HEAD").chop
     end
 
     def experimental_remotes
       remotes.select { |r| r =~ /^exp\d+$/ }
+    end
+
+    def force_push(remote)
+      git("push #{remote} HEAD:master -f")
     end
 
     private

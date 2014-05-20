@@ -1,9 +1,32 @@
 require 'spec_helper'
 
+describe Sagan::Heroku, '#deployed_branch' do
+  it 'returns the deployed branch environment variable' do
+    heroku = Sagan::Heroku.new('aremote')
+    allow(heroku).to receive(:`).
+      with('heroku config:get SAGAN_BRANCH -r aremote').
+      and_return('cool-feature')
+
+    expect(heroku.deployed_branch).to eq 'cool-feature'
+  end
+end
+
+describe Sagan::Heroku, '#set_deployed_branch' do
+  it 'sets the deployed branch in an environment variable' do
+    heroku = Sagan::Heroku.new('aremote')
+    allow(heroku).to receive(:`)
+
+    heroku.set_deployed_branch('cool-feature')
+
+    cmd = 'heroku config:set SAGAN_BRANCH=cool-feature -r aremote'
+    expect(heroku).to have_received(:`).with(cmd)
+  end
+end
+
 describe Sagan::Heroku, '#lock' do
   it 'sets the deployment lock environment variable on the server' do
     heroku = Sagan::Heroku.new('aremote')
-    heroku.stub(:`)
+    allow(heroku).to receive(:`)
 
     heroku.lock
 
@@ -15,7 +38,7 @@ end
 describe Sagan::Heroku, '#unlock' do
   it 'sets the deployment unlock environment variable on the server' do
     heroku = Sagan::Heroku.new('aremote')
-    heroku.stub(:`)
+    allow(heroku).to receive(:`)
 
     heroku.unlock
 
@@ -46,7 +69,7 @@ describe Sagan::Heroku, '#unlocked?' do
   end
 
   def stub_unlocked(value = nil)
-    heroku.stub(:`)
+    allow(heroku).to receive(:`)
       .with('heroku config:get EXPERIMENTAL_AVAILABLE -r aremote')
       .and_return(value)
   end
@@ -55,7 +78,7 @@ end
 describe Sagan::Heroku, '#maintenance_off' do
   it 'disables heroku maintenance' do
     heroku = Sagan::Heroku.new('exp2')
-    heroku.stub(:`)
+    allow(heroku).to receive(:`)
 
     heroku.maintenance_off
 
@@ -67,7 +90,7 @@ end
 describe Sagan::Heroku, '#maintenance_on' do
   it 'enables heroku maintenance' do
     heroku = Sagan::Heroku.new('exp2')
-    heroku.stub(:`)
+    allow(heroku).to receive(:`)
 
     heroku.maintenance_on
 
